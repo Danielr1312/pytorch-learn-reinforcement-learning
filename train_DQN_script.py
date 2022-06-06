@@ -22,7 +22,7 @@ from torch import nn
 import matplotlib.pyplot as plt
 from torch.optim import Adam
 from torch.utils.tensorboard import SummaryWriter
-
+#set GIT_PYTHON_GIT_EXECUTABLE=C:\Users\Daniel\AppData\Local\GitHubDesktop\app-3.0.1\resources\app\git\cmd\git.exe
 
 import utils.utils as utils
 from utils.replay_buffer import ReplayBuffer

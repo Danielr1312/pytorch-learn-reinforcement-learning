@@ -176,7 +176,7 @@ class ActorLearner:
 
         # Periodically save DQN models
         if self.checkpoint_freq is not None and num_steps > 0 and num_steps % self.checkpoint_freq == 0:
-            ckpt_model_name = f'dqn_{self.config["env_id"]}_ckpt_steps_{num_steps}.pth'
+            ckpt_model_name = f'dqn_{self.config["env_id"][4:]}_ckpt_steps_{num_steps}.pth'
             torch.save(utils.get_training_state(self.config, self.dqn), os.path.join(CHECKPOINTS_PATH, ckpt_model_name))
 
         # Log the gradients
@@ -229,7 +229,7 @@ def train_dqn(config):
 
     torch.save(  # save the best DQN model overall (gave the highest reward in an episode)
         utils.get_training_state(config, actor_learner.best_dqn_model),
-        os.path.join(BINARIES_PATH, utils.get_available_binary_name(config['env_id']))
+        os.path.join(BINARIES_PATH, utils.get_available_binary_name(config['env_id'][4:])) # added [4:] because ALE/ was causing an issue
     )
 
 
@@ -238,13 +238,13 @@ def get_training_args():
 
     # Training related
     parser.add_argument("--seed", type=int, help="Very important for reproducibility - set the random seed", default=23)
-    parser.add_argument("--env_id", type=str, help="Atari game id", default='BreakoutNoFrameskip-v4')
+    parser.add_argument("--env_id", type=str, help="Atari game id", default='ALE/Breakout-v5')
     parser.add_argument("--num_of_training_steps", type=int, help="Number of training env steps", default=50000000)
     parser.add_argument("--acting_learning_step_ratio", type=int, help="Number of experience collection steps for every learning step", default=4)
     parser.add_argument("--learning_rate", type=float, default=1e-4)
     parser.add_argument("--grad_clipping_value", type=float, default=5)  # 5 is fairly arbitrarily chosen
 
-    parser.add_argument("--replay_buffer_size", type=int, help="Number of frames to store in buffer", default=1000000)
+    parser.add_argument("--replay_buffer_size", type=int, help="Number of frames to store in buffer", default=10000)#1000000 originally
     parser.add_argument("--dont_crash_if_no_mem", action='store_false', help="Optimization - crash if not enough RAM before the training even starts (default=True)")
     parser.add_argument("--num_warmup_steps", type=int, help="Number of steps before learning starts", default=50000)
     parser.add_argument("--target_dqn_update_interval", type=int, help="Target DQN update freq per learning update", default=10000)

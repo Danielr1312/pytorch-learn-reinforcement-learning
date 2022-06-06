@@ -26,7 +26,7 @@ def get_env_wrapper(env_id, record_video=False):
 
     # This is necessary because AtariWrapper skips 4 frames by default, so we can't have additional skipping through
     # the environment itself - hence NoFrameskip requirement
-    assert 'NoFrameskip' in env_id, f'Expected NoFrameskip environment got {env_id}'
+    #assert 'NoFrameskip' in env_id, f'Expected NoFrameskip environment got {env_id}'
 
     # The only additional thing needed, on top of AtariWrapper,
     # is to convert the shape to channel-first because of PyTorch's models

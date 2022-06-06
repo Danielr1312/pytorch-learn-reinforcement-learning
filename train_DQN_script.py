@@ -238,7 +238,7 @@ def get_training_args():
 
     # Training related
     parser.add_argument("--seed", type=int, help="Very important for reproducibility - set the random seed", default=23)
-    parser.add_argument("--env_id", type=str, help="Atari game id", default='ALE/MsPacman-v5')
+    parser.add_argument("--env_id", type=str, help="Atari game id", default='BreakoutNoFrameskip-v4')
     parser.add_argument("--num_of_training_steps", type=int, help="Number of training env steps", default=50000000)
     parser.add_argument("--acting_learning_step_ratio", type=int, help="Number of experience collection steps for every learning step", default=4)
     parser.add_argument("--learning_rate", type=float, default=1e-4)

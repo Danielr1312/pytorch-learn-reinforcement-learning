@@ -129,7 +129,6 @@ def set_random_seeds(env, seed):
             torch.backends.cudnn.deterministic = True
             torch.backends.cudnn.benchmark = False
 
-
 # Test utils
 if __name__ == '__main__':
     import matplotlib.pyplot as plt

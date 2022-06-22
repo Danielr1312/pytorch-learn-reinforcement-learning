@@ -20,15 +20,16 @@ import numpy as np
 import torch
 from torch import nn
 import matplotlib.pyplot as plt
+import matplotlib
 from torch.optim import Adam
 from torch.utils.tensorboard import SummaryWriter
+#cd /d D:\Documents\GitHub\pytorch-learn-reinforcement-learning
 #set GIT_PYTHON_GIT_EXECUTABLE=C:\Users\Daniel\AppData\Local\GitHubDesktop\app-3.0.1\resources\app\git\cmd\git.exe
 
 import utils.utils as utils
 from utils.replay_buffer import ReplayBuffer
 from utils.constants import *
 from models.definitions.DQN import DQN
-
 
 class ActorLearner:
 
@@ -70,9 +71,13 @@ class ActorLearner:
         self.target_dqn_update_interval = config['target_dqn_update_interval']
         # should perform a hard or a soft update of target DQN weights
         self.tau = config['tau']
+        
+        self.average_episode_rwds = []
+        
 
     def collect_experience(self):
         # We're collecting more experience than we're doing weight updates (4x in the Nature paper)
+        
         for _ in range(self.acting_learning_step_ratio):
             last_index = self.replay_buffer.store_frame(self.last_frame)
             state = self.replay_buffer.fetch_last_state()  # state = 4 preprocessed last frames for Atari
@@ -84,6 +89,8 @@ class ActorLearner:
 
             if done_flag:
                 new_frame = self.env.reset()
+                #episode_durations.append()
+                #utils.plot_durations() ################################### ADDED
                 self.maybe_log_episode()
 
             self.last_frame = new_frame
@@ -150,19 +157,27 @@ class ActorLearner:
         plt.show()
 
     def maybe_log_episode(self):
+        avg_reward_list = []
+        
         rewards = self.env.get_episode_rewards()  # we can do this thanks to the Monitor wrapper
         episode_lengths = self.env.get_episode_lengths()
         num_episodes = len(rewards)
-
+        
         if self.episode_log_freq is not None and num_episodes % self.episode_log_freq == 0:
+            
+            for i in np.arrange(1, num_episodes, self.episode_log_freq) - 1:
+                avg_reward_list.append(mean(rewards[i])) ##############################################################
+            
             self.tensorboard_writer.add_scalar('Rewards per episode', rewards[-1], num_episodes)
             self.tensorboard_writer.add_scalar('Steps per episode', episode_lengths[-1], num_episodes)
-
+            plt.plot(np.arrange(1, num_episodes, self.episode_log_freq), avg_reward_list) ################################################################ plots best episode reward
+            plt.savefig(f"D:\Documents\GitHub\pytorch-learn-reinforcement-learning\models\plots\Best_Reward_by_episode_{num_episodes}.png", 'png')
+            
         if rewards[-1] > self.best_episode_reward:
             self.best_episode_reward = rewards[-1]
             self.config['best_episode_reward'] = self.best_episode_reward  # metadata
             self.best_dqn_model = copy.deepcopy(self.dqn)  # keep track of the model that gave the best reward
-
+                        
     def maybe_log(self):
         num_steps = self.env.get_total_steps()
 
@@ -196,7 +211,7 @@ class ActorLearner:
         print(f'Number of env steps = {self.get_number_of_env_steps()}')
 
 
-def train_dqn(config):
+def train_dqn(config):    
     env = utils.get_env_wrapper(config['env_id'])
     replay_buffer = ReplayBuffer(config['replay_buffer_size'], crash_if_no_mem=config['dont_crash_if_no_mem'])
 
@@ -226,7 +241,7 @@ def train_dqn(config):
 
         if num_env_steps > config['num_warmup_steps']:
             actor_learner.learn_from_experience()
-
+        
     torch.save(  # save the best DQN model overall (gave the highest reward in an episode)
         utils.get_training_state(config, actor_learner.best_dqn_model),
         os.path.join(BINARIES_PATH, utils.get_available_binary_name(config['env_id'][4:])) # added [4:] because ALE/ was causing an issue
@@ -261,7 +276,7 @@ def get_training_args():
     # Logging/debugging/checkpoint related (helps a lot with experimentation)
     parser.add_argument("--console_log_freq", type=int, help="Log to console after this many env steps (None = no logging)", default=10000)
     parser.add_argument("--log_freq", type=int, help="Log metrics to tensorboard after this many env steps (None = no logging)", default=10000)
-    parser.add_argument("--episode_log_freq", type=int, help="Log metrics to tensorboard after this many episodes (None = no logging)", default=5)
+    parser.add_argument("--episode_log_freq", type=int, help="Log metrics to tensorboard after this many episodes (None = no logging)", default=1) ### CHANGED
     parser.add_argument("--checkpoint_freq", type=int, help="Save checkpoint model after this many env steps (None = no checkpointing)", default=10000)
     parser.add_argument("--grads_log_freq", type=int, help="Log grad norms after this many weight update steps (None = no logging)", default=2500)
     parser.add_argument("--debug", action='store_true', help='Train in debugging mode')

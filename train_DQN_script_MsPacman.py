@@ -26,7 +26,7 @@ from torch.utils.tensorboard import SummaryWriter
 #cd /d D:\Documents\GitHub\pytorch-learn-reinforcement-learning
 #activate pytorch-rl-env
 #set GIT_PYTHON_GIT_EXECUTABLE=C:\Users\Daniel\AppData\Local\GitHubDesktop\app-3.0.1\resources\app\git\cmd\git.exe
-#python train_DQN_script.py
+#python train_DQN_script_MsPacman.py
 
 import utils.utils as utils
 from utils.replay_buffer import ReplayBuffer

@@ -31,7 +31,7 @@ from torch.utils.tensorboard import SummaryWriter
 import utils.utils as utils
 from utils.replay_buffer import ReplayBuffer
 from utils.constants import *
-from models.definitions.DQN import DQN
+from models.definitions.DQN_MsPacman import DQN
 
 class ActorLearner:
 
@@ -146,7 +146,6 @@ class ActorLearner:
             if self.tau == 1.:
                 print('Update target DQN (hard update)')
                 self.target_dqn.load_state_dict(self.dqn.state_dict())
-            else:  # soft update, the 2 branches can be merged together, leaving it like this for now
                 raise Exception(f'Soft update is not yet implemented (hard update was used in the original paper)')
 
     @staticmethod
